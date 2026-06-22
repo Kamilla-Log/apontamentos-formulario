@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apontamentos — Formulário de Pagamentos | Logcomex</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Funnel+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --lx-bg:#F5F6FC;
+  --lx-card:#ffffff;
+  --lx-purple:#6613D0;
+  --lx-purple-dark:#2D085D;
+  --lx-purple-med:#5B11BA;
+  --lx-purple-lt:#E2D0FA;
+  --lx-purple-xlt:#F3EDFC;
+  --lx-fg:#0B0D19;
+  --lx-muted:#5F616A;
+  --lx-border:rgba(11,13,25,0.10);
+  --lx-success:#1FAC66;
+  --lx-warning:#C99D02;
+  --lx-danger:#C70404;
+  --lx-success-bg:#E8F8F0;
+  --lx-warning-bg:#FDF8E1;
+  --lx-danger-bg:#FDEAEA;
+}
+body{background:var(--lx-bg);font-family:'Poppins',sans-serif;font-size:13px;color:var(--lx-fg);min-height:100vh}
+.wrap{max-width:900px;margin:0 auto;padding:24px 20px}
+
+/* Header */
+.header{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:16px;border-bottom:1px solid var(--lx-border)}
+.header-text h1{font-family:'Funnel Display',sans-serif;font-size:20px;color:var(--lx-purple-dark);line-height:1.2}
+.header-text p{font-size:11px;color:var(--lx-muted);margin-top:3px}
+
+/* KPIs */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.kpi{background:var(--lx-card);border-radius:8px;border:1px solid var(--lx-border);padding:12px 16px}
+.kpi-lbl{font-size:10px;color:var(--lx-muted);margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+.kpi-val{font-size:24px;font-weight:600;line-height:1;color:var(--lx-fg)}
+.kpi-val.d{color:var(--lx-danger)}.kpi-val.w{color:var(--lx-warning)}.kpi-val.g{color:var(--lx-success)}
+
+/* Barra de progresso */
+.prog-wrap{margin-bottom:16px}
+.prog-label{font-size:11px;color:var(--lx-muted);margin-bottom:5px;display:flex;justify-content:space-between}
+.prog-bar{height:5px;background:var(--lx-border);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:var(--lx-purple);border-radius:3px;transition:width .5s}
+
+/* Filtros */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.filters select,.filters input{font-family:'Poppins',sans-serif;font-size:12px;padding:6px 10px;height:34px;border-radius:8px;border:1px solid var(--lx-border);background:var(--lx-card);color:var(--lx-fg);outline:none;cursor:pointer}
+.filters select:focus,.filters input:focus{border-color:var(--lx-purple)}
+.save-msg{font-size:11px;color:var(--lx-success);margin-left:auto;opacity:0;transition:opacity .4s;display:flex;align-items:center;gap:5px;font-weight:500}
+.save-msg.show{opacity:1}
+
+/* Card */
+.card{background:var(--lx-card);border:1px solid var(--lx-border);border-radius:12px;padding:14px 16px;margin-bottom:10px;border-left:3px solid var(--lx-border);transition:opacity .3s}
+.card.prio-alta{border-left-color:var(--lx-danger)}
+.card.prio-media{border-left-color:var(--lx-warning)}
+.card.prio-baixa{border-left-color:var(--lx-success)}
+.card.done{opacity:.5}
+.card.done .ct{text-decoration:line-through;color:var(--lx-muted)}
+.card-top{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.num{width:26px;height:26px;min-width:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;background:var(--lx-purple-xlt);color:var(--lx-purple-dark)}
+.ct{font-size:13px;font-weight:500;color:var(--lx-fg);line-height:1.45;flex:1}
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;text-transform:uppercase;letter-spacing:.04em}
+.ba{background:var(--lx-danger-bg);color:var(--lx-danger)}
+.bm{background:var(--lx-warning-bg);color:var(--lx-warning)}
+.bb{background:var(--lx-success-bg);color:var(--lx-success)}
+.card-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;padding:10px;background:var(--lx-bg);border-radius:8px}
+.meta-lbl{font-size:10px;font-weight:600;color:var(--lx-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.meta-val{font-size:12px;color:var(--lx-fg);line-height:1.5}
+.card-bottom{display:grid;grid-template-columns:160px 1fr auto;gap:10px;align-items:end}
+.field-lbl{font-size:10px;font-weight:600;color:var(--lx-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+textarea{font-family:'Poppins',sans-serif;font-size:12px;padding:7px 9px;border-radius:8px;border:1px solid var(--lx-border);min-height:54px;resize:vertical;width:100%;color:var(--lx-fg);background:var(--lx-card);outline:none}
+textarea:focus{border-color:var(--lx-purple)}
+select.status-sel{font-family:'Poppins',sans-serif;font-size:12px;padding:6px 9px;height:34px;border-radius:8px;border:1px solid var(--lx-border);width:100%;color:var(--lx-fg);background:var(--lx-card);outline:none;cursor:pointer}
+select.status-sel:focus{border-color:var(--lx-purple)}
+.check-wrap{display:flex;flex-direction:column;align-items:center;gap:5px;padding-bottom:3px}
+.check-wrap span{font-size:10px;color:var(--lx-muted);font-weight:500}
+.chk-box{width:24px;height:24px;border-radius:6px;border:2px solid var(--lx-border);display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--lx-card);transition:all .15s;flex-shrink:0}
+.chk-box:hover{border-color:var(--lx-success)}
+.chk-box.checked{background:var(--lx-success);border-color:var(--lx-success)}
+.chk-box svg{display:none}
+.chk-box.checked svg{display:block}
+.hidden{display:none!important}
+.empty-msg{font-size:13px;color:var(--lx-muted);text-align:center;padding:32px 0}
+
+/* Loader */
+.loader{position:fixed;inset:0;background:rgba(245,246,252,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:12px}
+.loader.hidden{display:none}
+.spinner{width:28px;height:28px;border:3px solid var(--lx-purple-lt);border-top-color:var(--lx-purple);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader p{font-size:13px;color:var(--lx-purple-dark);font-weight:500}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--lx-purple-dark);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:1000}
+.toast.show{opacity:1}
+
+@media(max-width:600px){
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  .card-meta{grid-template-columns:1fr}
+  .card-bottom{grid-template-columns:1fr;gap:8px}
+}
+</style>
+</head>
+<body>
+
+<div class="loader" id="loader">
+  <div class="spinner"></div>
+  <p>Carregando apontamentos...</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="wrap">
+  <div class="header">
+    <svg viewBox="0 0 23.34 23.21" width="32" height="32" xmlns="http://www.w3.org/2000/svg" aria-label="Logcomex" style="flex-shrink:0">
+      <path d="M22.3405 18.0675H17.2352V23.1429H22.3405V18.0675Z" fill="#0B0D19"/>
+      <path d="M5.10529 6.64643L0 11.7254V18.0891C0 20.8816 2.27851 23.1467 5.08749 23.1467H11.4887L16.594 18.0714H5.10529V6.64643Z" fill="#0B0D19"/>
+      <path d="M17.2311 6.01289V17.4343L22.3364 12.3589V0.9375H10.8513L5.746 6.01289H17.2311Z" fill="#5B11BA"/>
+    </svg>
+    <div class="header-text">
+      <h1>Apontamentos — Formulário de Pagamentos</h1>
+      <p>Controle pré-testes · pagamentos-logcomexv3.pages.dev · 33 pontos identificados · Logcomex CP</p>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-lbl">Total</div><div class="kpi-val">33</div></div>
+    <div class="kpi"><div class="kpi-lbl">Pendentes</div><div class="kpi-val d" id="kPend">—</div></div>
+    <div class="kpi"><div class="kpi-lbl">Em andamento</div><div class="kpi-val w" id="kAnd">—</div></div>
+    <div class="kpi"><div class="kpi-lbl">Concluídos</div><div class="kpi-val g" id="kDone">—</div></div>
+  </div>
+
+  <div class="prog-wrap">
+    <div class="prog-label"><span id="progLabel">0 de 33 concluídos</span><span id="progPct">0%</span></div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+
+  <div class="filters">
+    <select id="fPrio" onchange="applyFilters()">
+      <option value="">Todas as prioridades</option>
+      <option value="Alta">Alta</option>
+      <option value="Média">Média</option>
+      <option value="Baixa">Baixa</option>
+    </select>
+    <select id="fStatus" onchange="applyFilters()">
+      <option value="">Todos os status</option>
+      <option value="Pendente">Pendente</option>
+      <option value="Em andamento">Em andamento</option>
+      <option value="Concluído">Concluído</option>
+    </select>
+    <input type="text" id="fSearch" placeholder="Buscar ponto..." oninput="applyFilters()" style="width:180px">
+    <span class="save-msg" id="saveMsg">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      Salvo
+    </span>
+  </div>
+
+  <div id="list"></div>
+  <div class="empty-msg hidden" id="emptyMsg">Nenhum ponto encontrado com esses filtros.</div>
+</div>
+
+<script>
+const SUPA_URL = 'https://moikuofjjyvleorbfhay.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vaWt1b2Zqanl2bGVvcmJmaGF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2ODYyOTgsImV4cCI6MjA5NzI2MjI5OH0.IL-sCw1Pi-QNSPfTVeeI6WEjbnUoGKVCJ6lYdm0aD6o';
+const TABLE = 'apontamentos_formulario';
+
+const POINTS = [
+  {id:1,prio:"Alta",text:"Lista de aprovadores/solicitantes com +300 entradas: duplicatas graves, nomes de teste, nomes incompletos e padrões de caixa misturados",risk:"Solicitante seleciona pessoa errada; aprovador recebe NF de área incorreta; rastreabilidade comprometida no Omie",prazo:"Antes dos testes — 1-2 dias"},
+  {id:2,prio:"Alta",text:"Lista de logger solicitante também precisa de padronização (mesmos problemas do ponto 1)",risk:"Confusão entre quem registrou e quem solicitou; dificulta auditoria no Pipefy",prazo:"Junto com ponto 1"},
+  {id:3,prio:"Alta",text:"Clicar em '+Criar novo card' abre sub-card de cadastro de logger no Pipefy em vez de continuar a solicitação",risk:"Usuário cria card indevido, duplica solicitações e interrompe fluxo",prazo:"Antes dos testes — 1 dia"},
+  {id:4,prio:"Alta",text:"Robô aceita NF emitida para UX Comex como Logcomex LTDA — sem validação da entidade destinatária",risk:"Pagamentos em nome de entidade errada; risco fiscal e contábil grave",prazo:"Bloqueante — 2-3 dias dev"},
+  {id:5,prio:"Alta",text:"Campo fornecedor permite nome livre — deve puxar nome automaticamente via CNPJ na Receita Federal",risk:"Fornecedores com nomes divergentes; impossível conciliar com Base_Fornecedores",prazo:"Bloqueante — 2-3 dias dev"},
+  {id:6,prio:"Alta",text:"IA lê NF com imposto e informa que não tem imposto — erro de leitura fiscal",risk:"Valores líquido/bruto incorretos; retenção não identificada gera pagamento errado",prazo:"Antes dos testes — 1-2 dias"},
+  {id:7,prio:"Média",text:"Após trocar NF para fornecedor já existente, botão '+Criar card' ainda aparece — não deveria existir quando IA já identificou o fornecedor",risk:"Usuário cria fornecedor duplicado; base de fornecedores corrompida",prazo:"Antes dos testes — 1 dia"},
+  {id:8,prio:"Média",text:"Campo 'Frequência de pagamento' sem opção 'Parcelado/Parcelamento' para pagamentos em parcelas",risk:"Classificação errada de frequência; dificulta controle de parcelas no Omie",prazo:"Antes dos testes — meio dia"},
+  {id:9,prio:"Baixa",text:"Layout da planilha de rateio precisa de ajuste visual — muito rudimentar",risk:"Baixa adesão; erros de preenchimento por má visualização",prazo:"Pode ir para pós-testes"},
+  {id:10,prio:"Baixa",text:"Campo descrição poderia puxar descrição da NF via IA e deixar a pessoa complementar",risk:"Preenchimento manual inconsistente; descrições genéricas dificultam conciliação",prazo:"Pós-testes — 1 dia"},
+  {id:11,prio:"Alta",text:"Sem validação cruzada entre valor do boleto com retenção e Valor bruto/líquido da NF preenchidos anteriormente",risk:"Valores divergentes entre NF e boleto passam sem alerta; pagamento incorreto",prazo:"Antes dos testes — 1 dia"},
+  {id:12,prio:"Média",text:"Data em 'Minhas solicitações' aparece com formato estranho — precisa padronizar exibição",risk:"Confusão de data; dificuldade de acompanhar vencimentos",prazo:"Antes dos testes — meio dia"},
+  {id:13,prio:"Alta",text:"Ao inserir uma única NF da Logcomex, o sistema exibe erros duplicados",risk:"Usuário acha que enviou a NF duas vezes ou que o sistema travou",prazo:"Antes dos testes — 1 dia"},
+  {id:14,prio:"Alta",text:"NF de reembolso puxou categoria 'Manutenção' — categorizou incorretamente",risk:"Lançamentos contábeis errados; reconciliação falha no fechamento",prazo:"Antes dos testes — 1 dia"},
+  {id:15,prio:"Média",text:"Mensagem sobre reembolso confusa: cita Pix e conta bancária de forma ambígua — precisa ser reescrita",risk:"Colaborador preenche conta errada; reembolso devolvido ou creditado incorretamente",prazo:"Antes dos testes — meio dia"},
+  {id:16,prio:"Média",text:"Pipe internacional sem opção de rateio e sem puxar categoria do histórico do fornecedor",risk:"Classificação manual incorreta; falta de rastreio por departamento em pagamentos internacionais",prazo:"Antes dos testes — 1-2 dias"},
+  {id:17,prio:"Alta",text:"IA não puxou dados bancários presentes na invoice no fluxo internacional",risk:"Usuário preenche banco manualmente com risco de erro; pagamento recusado no exterior",prazo:"Antes dos testes — 1-2 dias"},
+  {id:18,prio:"Média",text:"IA deve ser acionada no início do formulário ao anexar a NF para já preencher campos automaticamente",risk:"Usuário preenche campos manualmente que seriam automáticos; perda do diferencial da IA",prazo:"Antes dos testes — alinhamento dev"},
+  {id:19,prio:"Média",text:"Campo descrição de pagamentos do DP com limite de 60 caracteres — muito extenso para o uso do DP",risk:"DP não consegue preencher adequadamente; descrições truncadas no Omie",prazo:"Antes dos testes — meio dia"},
+  {id:20,prio:"Alta",text:"Em 'Minhas solicitações' botão 'Solicitar ajuste' clicável mas não faz nada",risk:"Usuário não consegue corrigir erros; precisa acionar CP manualmente",prazo:"Antes dos testes — 1 dia"},
+  {id:21,prio:"Média",text:"Verificar se Slack está vinculado para notificação quando card mudar de fase — testar com card da Kamilla",risk:"Sem notificação: equipe não sabe quando aprovar ou quando solicitação foi processada",prazo:"Antes dos testes — verificar config"},
+  {id:22,prio:"Alta",text:"Aprovadores não têm tela 'Minhas aprovações' para ver o que precisam aprovar",risk:"Adriano/Daniel precisam acessar Pipefy diretamente; aprovações atrasadas; gargalo no processo",prazo:"Antes dos testes — 2 dias dev"},
+  {id:23,prio:"Média",text:"Mensagem estranha aparece no início do dashboard — verificar se está correta",risk:"Primeira impressão negativa; usuários desconfiam do sistema",prazo:"Antes dos testes — meio dia"},
+  {id:24,prio:"Alta",text:"NF duplicada dá erro só no final — deveria alertar no início quando IA identificar NF já processada",risk:"Usuário perde todo o preenchimento antes de descobrir o erro; retrabalho",prazo:"Antes dos testes — 1-2 dias"},
+  {id:25,prio:"Média",text:"Não há tela de resumo/confirmação antes de enviar a solicitação definitivamente",risk:"Solicitações enviadas com erros; retrabalho para Thaiane no Pipefy",prazo:"Antes dos testes — 1 dia"},
+  {id:26,prio:"Alta",text:"Banner de debug visível para todos os usuários — deve ser exibido apenas para Kamilla e dev",risk:"Exposição de informações técnicas internas a todos os colaboradores",prazo:"Antes dos testes — imediato"},
+  {id:27,prio:"Alta",text:"Pagamentos TED: campo banco livre para digitação — deve puxar banco por código padrão (como Omie) e incluir CNPJ/CPF do favorecido",risk:"Formatação incorreta impede integração Omie; pagamento devolvido ou creditado errado",prazo:"Antes dos testes — 1-2 dias"},
+  {id:28,prio:"Média",text:"Verificar se texto e regras do reembolso estão alinhados com a política atual",risk:"Reembolso processado fora das regras; passivo para RH e Financeiro",prazo:"Antes dos testes — alinhar com Adriano"},
+  {id:29,prio:"Baixa",text:"Falta botão para acessar políticas de pagamento dentro do formulário — aguardando validação da diretoria",risk:"Usuário preenche sem consultar política; erros recorrentes de categoria e aprovador",prazo:"Pós-validação diretoria"},
+  {id:30,prio:"Média",text:"Campo 'Data da despesa' no reembolso aceita datas futuras e datas muito antigas — sem restrição de período",risk:"Reembolsos com datas inválidas; inconsistência contábil e fiscal",prazo:"Antes dos testes — meio dia"},
+  {id:31,prio:"Alta",text:"Login apenas por e-mail sem senha real — qualquer pessoa com e-mail @logcomex.com pode entrar como outra pessoa",risk:"Fraude de identidade nas solicitações; impossível auditar quem realmente abriu o card",prazo:"Bloqueante — alinhamento com TI"},
+  {id:32,prio:"Média",text:"Formulário sem indicador de progresso — página longa sem barra de progresso ou separação em etapas",risk:"Alta taxa de abandono; erros de preenchimento por falta de orientação visual",prazo:"Antes dos testes — 1-2 dias"},
+  {id:33,prio:"Alta",text:"IA pode sobrescrever campos já preenchidos ao anexar NF depois — sem alerta de sobrescrita ao usuário",risk:"Usuário perde dados digitados sem perceber; frustração e retrabalho",prazo:"Antes dos testes — 1 dia"},
+];
+
+let state = {};
+
+// ── Supabase REST helpers ─────────────────────────────────────────────────
+const HEADERS = {
+  'apikey': SUPA_KEY,
+  'Authorization': 'Bearer ' + SUPA_KEY,
+  'Content-Type': 'application/json',
+  'Prefer': 'return=minimal'
+};
+
+async function dbLoad() {
+  try {
+    const r = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?select=*`, { headers: HEADERS });
+    if (!r.ok) return false;
+    const rows = await r.json();
+    rows.forEach(row => {
+      state[row.id] = { status: row.status, comment: row.comment || '', done: row.done };
+    });
+    return true;
+  } catch(e) { return false; }
+}
+
+async function dbUpsert(id) {
+  const s = state[id] || { status: 'Pendente', comment: '', done: false };
+  try {
+    await fetch(`${SUPA_URL}/rest/v1/${TABLE}`, {
+      method: 'POST',
+      headers: { ...HEADERS, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify({ id, status: s.status, comment: s.comment, done: s.done, updated_at: new Date().toISOString() })
+    });
+  } catch(e) {}
+}
+
+// ── UI helpers ────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function showSaved() {
+  const m = document.getElementById('saveMsg');
+  m.classList.add('show');
+  clearTimeout(window._st);
+  window._st = setTimeout(() => m.classList.remove('show'), 2200);
+}
+
+function getS(id) {
+  return state[id] || { status: 'Pendente', comment: '', done: false };
+}
+
+function setField(id, key, val) {
+  if (!state[id]) state[id] = { status: 'Pendente', comment: '', done: false };
+  state[id][key] = val;
+  if (key === 'done') {
+    state[id].status = val ? 'Concluído' : (state[id].status === 'Concluído' ? 'Pendente' : state[id].status);
+    const sel = document.querySelector(`#card-${id} .status-sel`);
+    if (sel) sel.value = state[id].status;
+    const card = document.getElementById('card-' + id);
+    if (card) { card.classList.toggle('done', val); card.dataset.status = state[id].status; }
+    const box = document.querySelector(`#card-${id} .chk-box`);
+    if (box) box.classList.toggle('checked', val);
+  }
+  if (key === 'status') {
+    state[id].done = val === 'Concluído';
+    const card = document.getElementById('card-' + id);
+    if (card) { card.classList.toggle('done', state[id].done); card.dataset.status = val; }
+    const box = document.querySelector(`#card-${id} .chk-box`);
+    if (box) box.classList.toggle('checked', state[id].done);
+  }
+  dbUpsert(id);
+  showSaved();
+  updateKPIs();
+  applyFilters();
+}
+
+function badgeCls(p) { return p === 'Alta' ? 'ba' : p === 'Média' ? 'bm' : 'bb'; }
+function prioSlug(p) { return p === 'Alta' ? 'alta' : p === 'Média' ? 'media' : 'baixa'; }
+
+function cardHTML(pt) {
+  const s = getS(pt.id);
+  return `<div class="card prio-${prioSlug(pt.prio)}${s.done ? ' done' : ''}" id="card-${pt.id}" data-prio="${pt.prio}" data-status="${s.status}" data-text="${(pt.text + ' ' + pt.risk).toLowerCase()}">
+  <div class="card-top">
+    <div class="num">${pt.id}</div>
+    <div class="ct">${pt.text}</div>
+    <span class="badge ${badgeCls(pt.prio)}">${pt.prio}</span>
+  </div>
+  <div class="card-meta">
+    <div><div class="meta-lbl">Risco se não corrigido</div><div class="meta-val">${pt.risk}</div></div>
+    <div><div class="meta-lbl">Prazo sugerido</div><div class="meta-val">${pt.prazo}</div></div>
+  </div>
+  <div class="card-bottom">
+    <div>
+      <div class="field-lbl">Status</div>
+      <select class="status-sel" onchange="setField(${pt.id},'status',this.value)">
+        <option${s.status === 'Pendente' ? ' selected' : ''}>Pendente</option>
+        <option${s.status === 'Em andamento' ? ' selected' : ''}>Em andamento</option>
+        <option${s.status === 'Concluído' ? ' selected' : ''}>Concluído</option>
+      </select>
+    </div>
+    <div>
+      <div class="field-lbl">Comentário / responsável</div>
+      <textarea placeholder="Ex: Thai vai tratar, prazo 25/06..." onchange="setField(${pt.id},'comment',this.value)">${s.comment || ''}</textarea>
+    </div>
+    <div class="check-wrap">
+      <div class="chk-box${s.done ? ' checked' : ''}" onclick="setField(${pt.id},'done',!getS(${pt.id}).done)" role="checkbox" aria-label="Concluído" aria-checked="${s.done}">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <span>Concluído</span>
+    </div>
+  </div>
+</div>`;
+}
+
+function renderAll() {
+  document.getElementById('list').innerHTML = POINTS.map(cardHTML).join('');
+}
+
+function updateKPIs() {
+  let p = 0, a = 0, d = 0;
+  POINTS.forEach(pt => {
+    const s = getS(pt.id);
+    if (s.status === 'Concluído') d++;
+    else if (s.status === 'Em andamento') a++;
+    else p++;
+  });
+  document.getElementById('kPend').textContent = p;
+  document.getElementById('kAnd').textContent = a;
+  document.getElementById('kDone').textContent = d;
+  const pct = Math.round((d / 33) * 100);
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progLabel').textContent = `${d} de 33 concluídos`;
+  document.getElementById('progPct').textContent = pct + '%';
+}
+
+function applyFilters() {
+  const prio = document.getElementById('fPrio').value;
+  const status = document.getElementById('fStatus').value;
+  const search = document.getElementById('fSearch').value.toLowerCase();
+  let vis = 0;
+  document.querySelectorAll('.card').forEach(c => {
+    const ok = (!prio || c.dataset.prio === prio) && (!status || c.dataset.status === status) && (!search || c.dataset.text.includes(search));
+    c.classList.toggle('hidden', !ok);
+    if (ok) vis++;
+  });
+  document.getElementById('emptyMsg').classList.toggle('hidden', vis > 0);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+async function init() {
+  const loader = document.getElementById('loader');
+  const ok = await dbLoad();
+  if (!ok) showToast('Modo offline — dados salvos localmente');
+  loader.classList.add('hidden');
+  renderAll();
+  updateKPIs();
+}
+
+init();
+</script>
+</body>
+</html>

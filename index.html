@@ -37,8 +37,8 @@ body{background:#F5F6FC;font-family:'Poppins',sans-serif;font-size:13px;color:#0
 .badge{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0;text-transform:uppercase;letter-spacing:.04em}
 .ba{background:#FDEAEA;color:#C70404}.bm{background:#FDF8E1;color:#C99D02}.bb{background:#E8F8F0;color:#1FAC66}
 
-/* Três colunas */
-.card-cols{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid rgba(11,13,25,.07)}
+/* Duas colunas */
+.card-cols{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid rgba(11,13,25,.07)}
 .col{padding:12px 16px;border-right:1px solid rgba(11,13,25,.07)}
 .col:last-child{border-right:none}
 .col-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;display:flex;align-items:center;gap:5px}
@@ -68,6 +68,10 @@ body{background:#F5F6FC;font-family:'Poppins',sans-serif;font-size:13px;color:#0
 .chk-box.checked svg{display:block}
 .chk-lbl{font-size:10px;color:#5F616A;font-weight:500;white-space:nowrap}
 
+/* Campos editáveis inline */
+[contenteditable="true"]{border-radius:4px;padding:2px 4px;margin:-2px -4px;transition:background .15s,outline .15s;outline:none;cursor:text}
+[contenteditable="true"]:hover{background:rgba(102,19,208,.05)}
+[contenteditable="true"]:focus{background:rgba(102,19,208,.08);outline:1px solid rgba(102,19,208,.25)}
 .hidden{display:none!important}
 .empty-msg{font-size:13px;color:#5F616A;text-align:center;padding:32px 0}
 .loader{position:fixed;inset:0;background:rgba(245,246,252,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:12px}
@@ -145,8 +149,8 @@ const TABLE='apontamentos_formulario';
 const H={'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'};
 
 const POINTS=[
-{id:1,prio:'Alta',titulo:'Lista de aprovadores/solicitantes com +300 entradas: duplicatas, nomes de teste e padrões de caixa misturados',acao:'Limpar lista: remover duplicatas, nomes de teste e padronizar capitalização',prazo_sug:'Antes dos testes',prob:'Solicitante seleciona pessoa errada; aprovador recebe NF da área incorreta; rastreabilidade comprometida no Omie'},
-{id:2,prio:'Alta',titulo:'Lista de logger solicitante sem padronização',acao:'Aplicar mesma limpeza do ponto 1 na lista de logger',prazo_sug:'Junto com ponto 1',prob:'Confusão entre quem registrou e quem solicitou; dificulta auditoria no Pipefy'},
+{id:1,prio:'Alta',titulo:'Lista de aprovadores/solicitantes com +300 entradas: duplicatas, nomes de teste e padrões de caixa misturados',acao:'Limpar lista: remover duplicatas, nomes de teste e padronizar capitalização',prazo_sug:'Antes dos testes',prob:'Despadronização da base pode causar erro de integração com o Omie; nomes divergentes impedem o de/para correto entre o formulário e o ERP'},
+{id:2,prio:'Alta',titulo:'Lista de logger solicitante sem padronização',acao:'Aplicar mesma limpeza do ponto 1 na lista de logger',prazo_sug:'Junto com ponto 1',prob:'Despadronização da base pode causar erro de integração; inconsistência entre logger e solicitante compromete rastreabilidade no Pipefy e no Omie'},
 {id:3,prio:'Alta',titulo:"Ao clicar em '+Criar novo card' abre sub-card de cadastro de logger no Pipefy",acao:'Corrigir comportamento do botão ou ocultá-lo até definição',prazo_sug:'Antes dos testes — 1 dia dev',prob:'Usuário cria card indevido no Pipefy, duplicando solicitações e interrompendo o fluxo'},
 {id:4,prio:'Alta',titulo:'Robô aceita NF emitida para UX Comex como se fosse Logcomex LTDA',acao:'Implementar validação da entidade destinatária no CNPJ da NF',prazo_sug:'Bloqueante — 2-3 dias dev',prob:'Pagamentos processados em nome de entidade errada; risco fiscal e contábil grave'},
 {id:5,prio:'Alta',titulo:'Campo fornecedor permite nome livre sem validação de CNPJ',acao:'Integrar campo com BrasilAPI: ao digitar CNPJ, nome é puxado automaticamente',prazo_sug:'Bloqueante — 2-3 dias dev',prob:'Fornecedores com nomes divergentes; impossível conciliar com Base_Fornecedores'},
@@ -238,6 +242,16 @@ function setField(id,key,val){
   dbUpsert(id);showSaved();updateKPIs();applyFilters();
 }
 
+function editField(id,field,el){
+  const txt=el.innerText.trim();
+  if(!txt)return;
+  const pt=POINTS.find(p=>p.id===id);
+  if(pt)pt[field]=txt;
+  const card=document.getElementById('card-'+id);
+  if(card)card.dataset.text=(POINTS.find(p=>p.id===id).titulo+POINTS.find(p=>p.id===id).acao+POINTS.find(p=>p.id===id).prob).toLowerCase();
+  showSaved();
+}
+
 function badgeCls(p){return p==='Alta'?'ba':p==='Média'?'bm':'bb'}
 function prioSlug(p){return p==='Alta'?'alta':p==='Média'?'media':'baixa'}
 
@@ -246,21 +260,17 @@ function cardHTML(pt){
   return `<div class="card prio-${prioSlug(pt.prio)}${s.done?' done':''}" id="card-${pt.id}" data-prio="${pt.prio}" data-status="${s.status}" data-text="${(pt.titulo+pt.acao+pt.prob).toLowerCase()}">
   <div class="card-head">
     <div class="num">${pt.id}</div>
-    <div class="titulo${s.done?' riscado':''}">${pt.titulo}</div>
+    <div class="titulo${s.done?' riscado':''}" contenteditable="true" spellcheck="false" onblur="editField(${pt.id},'titulo',this)">${pt.titulo}</div>
     <span class="badge ${badgeCls(pt.prio)}">${pt.prio}</span>
   </div>
   <div class="card-cols">
     <div class="col">
       <div class="col-lbl acao"><span class="col-dot dot-acao"></span>Ação necessária</div>
-      <div class="col-val">${pt.acao}</div>
-    </div>
-    <div class="col">
-      <div class="col-lbl prazo"><span class="col-dot dot-prazo"></span>Prazo sugerido</div>
-      <div class="col-val">${pt.prazo_sug}</div>
+      <div class="col-val" contenteditable="true" spellcheck="false" onblur="editField(${pt.id},'acao',this)">${pt.acao}</div>
     </div>
     <div class="col">
       <div class="col-lbl prob"><span class="col-dot dot-prob"></span>Problema se soltar agora</div>
-      <div class="col-val">${pt.prob}</div>
+      <div class="col-val" contenteditable="true" spellcheck="false" onblur="editField(${pt.id},'prob',this)">${pt.prob}</div>
     </div>
   </div>
   <div class="card-foot">
